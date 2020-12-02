@@ -1,23 +1,26 @@
-from projectVariables import letterOrder
+import PyQt5.QtWidgets as qtw
 
-def inputAtack():
-    wrongCoord = True
-    while wrongCoord:
-        coord = input("Introdu coordonatele de atac [A-H][1, 8]: ")
-        coord = coord.replace(" ", "")
-        coord = coord.upper()
-        if coord[0] >= "A" and coord[0] <= "H" and coord[1] >= "1" and coord[1] <= "8":
-            wrongCoord = False
-        else:
-            print("Format Incorect.")
+class MainWindow(qtw.QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Battleships")
+        self.setLayout(qtw.QHBoxLayout())
+        self.keypad()
 
-    #   coord[0] = coordonata x
-    #   coord[1] = coordonata y
-    x, y = coord
+        self.show()
 
-    return letterOrder[x], int(y)
+    def keypad(self):
+        container = qtw.QWidget()
+        container.setLayout(qtw.QGridLayout())
+
+        btns = [[qtw.QPushButton() for i in range(9)] for j in range(9)]
+        for i in range (9):
+            for j in range (9):
+                container.layout().addWidget(btns[i][j], i, j)
+        self.layout().addWidget(container)
+
 
 if __name__ == "__main__":
-    print("Hellow World")
-    x, y = inputAtack()
-    print ("Punctul de atac este: " + str(x) + "-" + str(y))
+    app = qtw.QApplication([])
+    mw = MainWindow()
+    app.exec_()
