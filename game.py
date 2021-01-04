@@ -8,7 +8,11 @@ LINE_WIDTH = 5
 BG_COLOR = (65,105,225) #   rgb royal blue  
 LINE_COLOR = (95,158,160) # rgb cadet blue
 RED = (255, 0, 0) # rgb red
+GREEN = (0, 255, 0)
 BLACK = (0, 0, 0) # rgb black
+
+shipBoard = [[[0 for i in range(8)] for j in range(8)] for k in range(2)]
+shotBoard = [[[0 for i in range(8)] for j in range(8)] for k in range(2)]
 
 #   printing the board
 def drawLines():
@@ -33,10 +37,6 @@ def drawShot(x, y, player):
     pygame.draw.line(screen, shotColor, (addX + 10 + 50 * x, addY + 10 + 50 * y), (addX + 40 + 50 * x, addY + 40 + 50 * y), LINE_WIDTH)
     pygame.draw.line(screen, shotColor, (addX + 40 + 50 * x, addY + 10 + 50 * y), (addX + 10 + 50 * x, addY + 40 + 50 * y), LINE_WIDTH)
 
-
-shipBoard = [[[0 for i in range(8)] for j in range(8)] for k in range(2)]
-shotBoard = [[[0 for i in range(8)] for j in range(8)] for k in range(2)]
-
 def markShot(row, col, player):
     shotBoard[player][row][col] = 1
 
@@ -54,6 +54,38 @@ def gameOver(player):
                 cnt = cnt + 1
     return cnt == 5
 
+def displayPlayer(player):
+    font = pygame.font.Font('freesansbold.ttf', 32)
+    if player == 0:
+        player1Text = font.render('Player 1', True, BLACK, GREEN)
+        player2Text = font.render('Player 2', True, BLACK, RED)
+    else:
+        player1Text = font.render('Player 1', True, BLACK, RED)
+        player2Text = font.render('Player 2', True, BLACK, GREEN)
+    textRect = player1Text.get_rect()
+    textRect.center = (WIDTH // 4, HEIGHT // 7)
+    screen.blit(player1Text, textRect)
+    textRect = player2Text.get_rect()
+    textRect.center = (WIDTH // 4 * 3, HEIGHT // 7)
+    screen.blit(player2Text, textRect)
+    pygame.display.update()
+
+def displayWiner(player):
+    font = pygame.font.Font('freesansbold.ttf', 32)
+    if player == 0:
+        player1Text = font.render('Player 1 wins', True, BLACK, GREEN)
+        player2Text = font.render('Player 2 loses', True, BLACK, RED)
+    else:
+        player1Text = font.render('Player 1 loses', True, BLACK, RED)
+        player2Text = font.render('Player 2 wins', True, BLACK, GREEN)
+    textRect = player1Text.get_rect()
+    textRect.center = (WIDTH // 4, HEIGHT // 7)
+    screen.blit(player1Text, textRect)
+    textRect = player2Text.get_rect()
+    textRect.center = (WIDTH // 4 * 3, HEIGHT // 7)
+    screen.blit(player2Text, textRect)
+    pygame.display.update()
+
 if __name__ == "__main__":
     #   initial game state
     pygame.init()
@@ -64,20 +96,20 @@ if __name__ == "__main__":
     pygame.display.update()
     player = 0
 
-    shipBoard[1][0][0] = 1
-    shipBoard[1][1][0] = 1
-    shipBoard[1][2][0] = 1
-    shipBoard[1][3][0] = 1
-    shipBoard[1][4][0] = 1
-
     shipBoard[0][0][0] = 1
-    shipBoard[0][1][0] = 1
-    shipBoard[0][2][0] = 1
-    shipBoard[0][3][0] = 1
-    shipBoard[0][4][0] = 1
+    shipBoard[0][0][1] = 1
+    shipBoard[0][0][2] = 1
+    shipBoard[0][0][3] = 1
+    shipBoard[0][0][4] = 1
+    shipBoard[1][0][0] = 1
+    shipBoard[1][0][1] = 1
+    shipBoard[1][0][2] = 1
+    shipBoard[1][0][3] = 1
+    shipBoard[1][0][4] = 1
 
     #   main loop
     while True:
+        displayPlayer(player)
         #   events handler  
         for event in pygame.event.get():
             #   quit event
@@ -117,6 +149,7 @@ if __name__ == "__main__":
                         if hit(boardX, boardY, player) == False:
                             player = 1 - player
                         if gameOver(player):
+                            displayWiner(player)
                             print("Player " + str(player + 1) + " win!")
                             time.sleep(3)
                             sys.exit()
