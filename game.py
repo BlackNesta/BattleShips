@@ -2,6 +2,7 @@ import pygame
 import sys
 import time
 
+#   program constants
 WIDTH = 1150
 HEIGHT = 600
 LINE_WIDTH = 5
@@ -11,8 +12,30 @@ RED = (255, 0, 0) # rgb red
 GREEN = (0, 255, 0)
 BLACK = (0, 0, 0) # rgb black
 
+#   game window
+pygame.init()
+screen = pygame.display.set_mode( (WIDTH, HEIGHT) )
+pygame.display.set_caption('BATTLESHIPS')
+
 shipBoard = [[[0 for i in range(8)] for j in range(8)] for k in range(2)]
 shotBoard = [[[0 for i in range(8)] for j in range(8)] for k in range(2)]
+
+def markShot(row, col, player):
+    shotBoard[player][row][col] = 1
+
+def availablSquare(row, col, player):
+    return shotBoard[player][row][col] == 0
+
+def hit(row, col, player):
+    return shipBoard[1 - player][row][col] == 1
+
+def gameOver(player):
+    cnt = 0
+    for i in range(8):
+        for j in range(8):
+            if shipBoard[1 - player][i][j] == 1 and shotBoard[player][i][j] == 1:
+                cnt = cnt + 1
+    return cnt == 5
 
 #   printing the board
 def drawLines():
@@ -47,23 +70,6 @@ def drawShip(x, y, player):
     pygame.draw.line(screen, shotColor, (addX + 10 + 50 * x, addY + 10 + 50 * y), (addX + 40 + 50 * x, addY + 40 + 50 * y), LINE_WIDTH)
     pygame.draw.line(screen, shotColor, (addX + 40 + 50 * x, addY + 10 + 50 * y), (addX + 10 + 50 * x, addY + 40 + 50 * y), LINE_WIDTH)
     pygame.display.update()
-
-def markShot(row, col, player):
-    shotBoard[player][row][col] = 1
-
-def availablSquare(row, col, player):
-    return shotBoard[player][row][col] == 0
-
-def hit(row, col, player):
-    return shipBoard[1 - player][row][col] == 1
-
-def gameOver(player):
-    cnt = 0
-    for i in range(8):
-        for j in range(8):
-            if shipBoard[1 - player][i][j] == 1 and shotBoard[player][i][j] == 1:
-                cnt = cnt + 1
-    return cnt == 5
 
 def displayPlayer(player):
     font = pygame.font.Font('freesansbold.ttf', 32)
@@ -192,18 +198,15 @@ def placeShip(player):
                             k = 0
                             mouse = []
 
-if __name__ == "__main__":
-    #   initial game state
-    pygame.init()
-    screen = pygame.display.set_mode( (WIDTH, HEIGHT) )
-    pygame.display.set_caption('BATTLESHIPS')
+def setGameEnvironment():
     placeShip(0)
     placeShip(1)
-    print(shipBoard[1])
     #   set table for playing
     screen.fill(BG_COLOR)
     drawLines()
     pygame.display.update()
+
+def playGame():
     player = 0
     #   main loop
     while True:
@@ -251,3 +254,9 @@ if __name__ == "__main__":
                             time.sleep(3)
                             sys.exit()
                 print(mouseX, mouseY, playerTable, boardX, boardY)
+
+if __name__ == "__main__":
+    #   initial game state
+    setGameEnvironment()
+    playGame()
+    
