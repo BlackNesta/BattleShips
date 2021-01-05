@@ -120,10 +120,10 @@ def placeShip(player):
     #   player 1 ship placing
     while ok == False:
         if k == 0:
-                    screen.fill(BG_COLOR)
-                    drawLines()
-                    displayPlacing(player)
-                    pygame.display.update()
+            screen.fill(BG_COLOR)
+            drawLines()
+            displayPlacing(player)
+            pygame.display.update()
         for event in pygame.event.get():
             #   quit event
             if event.type == pygame.QUIT:
@@ -160,19 +160,19 @@ def placeShip(player):
                     if k == 1:
                         drawShip(mouse[0][0], mouse[0][1], player)
                         pygame.display.update()
-                        time.sleep(1)
                     if k == 2:
                         drawShip(mouse[1][0], mouse[1][1], player)
                         pygame.display.update()
-                        time.sleep(1)
+                        time.sleep(0.5)
                         if mouse[0][0] == mouse[1][0]:
                             if abs(mouse[0][1] - mouse[1][1]) + 1 == 5:
                                 x = mouse[0][0]
                                 y = min(mouse[0][1], mouse[1][1])
-                                for i in range(0, 6):
+                                for i in range(0, 5):
+                                    drawShip(x, y + i, player)
                                     shipBoard[player][x][y + i] = 1
+                                time.sleep(1)
                                 return
-                               
                             else:
                                 k = 0
                                 mouse = []
@@ -180,8 +180,10 @@ def placeShip(player):
                             if abs(mouse[0][0] - mouse[1][0]) + 1 == 5:
                                 x = min(mouse[0][0], mouse[1][0])
                                 y = mouse[0][1]
-                                for i in range(0, 6):
+                                for i in range(0, 5):
+                                    drawShip(x + i, y, player)
                                     shipBoard[player][x + i][y] = 1
+                                time.sleep(1)
                                 return
                             else:
                                 k = 0
@@ -195,20 +197,10 @@ if __name__ == "__main__":
     pygame.init()
     screen = pygame.display.set_mode( (WIDTH, HEIGHT) )
     pygame.display.set_caption('BATTLESHIPS')
-    screen.fill(BG_COLOR)
-    drawLines()
-    pygame.display.update()
-    player = 0
-
     placeShip(0)
-    print(shipBoard[0])
-    
-    screen.fill(BG_COLOR)
-    drawLines()
-    pygame.display.update()
     placeShip(1)
     print(shipBoard[1])
-    
+    #   set table for playing
     screen.fill(BG_COLOR)
     drawLines()
     pygame.display.update()
@@ -251,7 +243,6 @@ if __name__ == "__main__":
                     if availablSquare(boardX, boardY, player):
                         markShot(boardX, boardY, player)
                         drawShot(boardX, boardY, player)
-                        
                         if hit(boardX, boardY, player) == False:
                             player = 1 - player
                         if gameOver(player):
