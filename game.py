@@ -36,6 +36,17 @@ def drawShot(x, y, player):
         shotColor = RED
     pygame.draw.line(screen, shotColor, (addX + 10 + 50 * x, addY + 10 + 50 * y), (addX + 40 + 50 * x, addY + 40 + 50 * y), LINE_WIDTH)
     pygame.draw.line(screen, shotColor, (addX + 40 + 50 * x, addY + 10 + 50 * y), (addX + 10 + 50 * x, addY + 40 + 50 * y), LINE_WIDTH)
+    pygame.display.update()
+
+def drawShip(x, y, player):
+    addX = 100
+    addY = 150
+    shotColor = BLACK
+    if player == 1:
+        addX = addX + 550
+    pygame.draw.line(screen, shotColor, (addX + 10 + 50 * x, addY + 10 + 50 * y), (addX + 40 + 50 * x, addY + 40 + 50 * y), LINE_WIDTH)
+    pygame.draw.line(screen, shotColor, (addX + 40 + 50 * x, addY + 10 + 50 * y), (addX + 10 + 50 * x, addY + 40 + 50 * y), LINE_WIDTH)
+    pygame.display.update()
 
 def markShot(row, col, player):
     shotBoard[player][row][col] = 1
@@ -86,6 +97,99 @@ def displayWiner(player):
     screen.blit(player2Text, textRect)
     pygame.display.update()
 
+def displayPlacing(player):
+    font = pygame.font.Font('freesansbold.ttf', 32)
+    if player == 0:
+        player1Text = font.render('Player 1 placing ship...', True, BLACK, GREEN)
+        player2Text = font.render('Player 2 waiting', True, BLACK, RED)
+    else:
+        player1Text = font.render('Player 1 ship placed', True, BLACK, RED)
+        player2Text = font.render('Player 2 placing ship...', True, BLACK, GREEN)
+    textRect = player1Text.get_rect()
+    textRect.center = (WIDTH // 4, HEIGHT // 7)
+    screen.blit(player1Text, textRect)
+    textRect = player2Text.get_rect()
+    textRect.center = (WIDTH // 4 * 3, HEIGHT // 7)
+    screen.blit(player2Text, textRect)
+    pygame.display.update()
+
+def placeShip(player):
+    ok = False
+    k = 0
+    mouse = []
+    #   player 1 ship placing
+    while ok == False:
+        if k == 0:
+                    screen.fill(BG_COLOR)
+                    drawLines()
+                    displayPlacing(player)
+                    pygame.display.update()
+        for event in pygame.event.get():
+            #   quit event
+            if event.type == pygame.QUIT:
+                sys.exit()
+            #   click event
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                #   mouse position
+                mouseX = event.pos[0]
+                mouseY = event.pos[1]
+                playerTable = -1
+                #   player board
+                if mouseX in range(100, 501) and mouseY in range(150, 551):
+                    playerTable = 0
+                elif mouseX in range(650, 1051) and mouseY in range(150, 551):
+                    playerTable = 1
+                else:
+                    playerTable = -1
+                #   board position
+                boardX = -1
+                boardY = -1
+                if playerTable == 0:
+                    mouseX = mouseX - 100
+                    mouseY = mouseY - 150
+                    boardX = mouseX // 50
+                    boardY = mouseY // 50
+                elif playerTable == 1:
+                    mouseX = mouseX - 650
+                    mouseY = mouseY - 150
+                    boardX = mouseX // 50
+                    boardY = mouseY // 50
+                if playerTable == player:
+                    mouse.append((boardX, boardY))
+                    k += 1
+                    if k == 1:
+                        drawShip(mouse[0][0], mouse[0][1], player)
+                        pygame.display.update()
+                        time.sleep(1)
+                    if k == 2:
+                        drawShip(mouse[1][0], mouse[1][1], player)
+                        pygame.display.update()
+                        time.sleep(1)
+                        if mouse[0][0] == mouse[1][0]:
+                            if abs(mouse[0][1] - mouse[1][1]) + 1 == 5:
+                                x = mouse[0][0]
+                                y = min(mouse[0][1], mouse[1][1])
+                                for i in range(0, 6):
+                                    shipBoard[player][x][y + i] = 1
+                                return
+                               
+                            else:
+                                k = 0
+                                mouse = []
+                        elif mouse[0][1] == mouse[1][1]:
+                            if abs(mouse[0][0] - mouse[1][0]) + 1 == 5:
+                                x = min(mouse[0][0], mouse[1][0])
+                                y = mouse[0][1]
+                                for i in range(0, 6):
+                                    shipBoard[player][x + i][y] = 1
+                                return
+                            else:
+                                k = 0
+                                mouse = []
+                        else:
+                            k = 0
+                            mouse = []
+
 if __name__ == "__main__":
     #   initial game state
     pygame.init()
@@ -96,17 +200,19 @@ if __name__ == "__main__":
     pygame.display.update()
     player = 0
 
-    shipBoard[0][0][0] = 1
-    shipBoard[0][0][1] = 1
-    shipBoard[0][0][2] = 1
-    shipBoard[0][0][3] = 1
-    shipBoard[0][0][4] = 1
-    shipBoard[1][0][0] = 1
-    shipBoard[1][0][1] = 1
-    shipBoard[1][0][2] = 1
-    shipBoard[1][0][3] = 1
-    shipBoard[1][0][4] = 1
-
+    placeShip(0)
+    print(shipBoard[0])
+    
+    screen.fill(BG_COLOR)
+    drawLines()
+    pygame.display.update()
+    placeShip(1)
+    print(shipBoard[1])
+    
+    screen.fill(BG_COLOR)
+    drawLines()
+    pygame.display.update()
+    player = 0
     #   main loop
     while True:
         displayPlayer(player)
@@ -145,7 +251,7 @@ if __name__ == "__main__":
                     if availablSquare(boardX, boardY, player):
                         markShot(boardX, boardY, player)
                         drawShot(boardX, boardY, player)
-                        pygame.display.update()
+                        
                         if hit(boardX, boardY, player) == False:
                             player = 1 - player
                         if gameOver(player):
